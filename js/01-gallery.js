@@ -8,6 +8,8 @@ const refs = {
   containerForMarkup: document.querySelector('.gallery'),
 };
 
+let createEl;
+
 refs.containerForMarkup.addEventListener('click', onImageClick);
 
 const createElement = galleryItems
@@ -33,13 +35,26 @@ function onImageClick(event) {
     return;
   }
 
-  const instance = basicLightbox
-    .create(
-      `<img
-          src="${event.target.dataset.source}"
+  createEl = basicLightbox.create(
+    `<img src="${event.target.dataset.source}" 
           alt="${event.target.alt}"
         />`,
-      { closable: true }
-    )
-    .show();
+    {
+      onShow: () => {
+        window.addEventListener('keydown', onEscKeyPress);
+      },
+      onClose: () => {
+        window.removeEventListener('keydown', onEscKeyPress);
+      },
+    }
+  );
+
+  createEl.show();
+}
+
+function onEscKeyPress(event) {
+  if (event.code !== 'Escape') {
+    return;
+  }
+  createEl.close();
 }
